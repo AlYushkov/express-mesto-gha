@@ -40,7 +40,7 @@ function handleResponse(promise, res) {
         .catch((e) => {
             const error = errorCatcher(e.name, validationError, castError);
             if (error) {
-                promise.res.status(error.status).send({ message: error.message });
+                res.status(error.status).send({ message: error.message });
                 return;
             }
             res.status(500).send({ message: 'Ошибка на сервере' });

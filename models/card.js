@@ -39,12 +39,13 @@ const cardSchema = new Schema({
     name: {
         type: String,
         required: true,
-        minlength: 2,
+        minlength: 4,
         maxlength: 30,
     },
     link:
     {
         type: String,
+        minlength: 6,
         required: true,
     },
     owner: {
