@@ -4,14 +4,14 @@ const schema = new Schema({
     name: {
         type: String,
         required: true,
-        minlength: 2,
+        minlength: 4,
         maxlength: 30,
     },
     about:
     {
         type: String,
         required: true,
-        minlength: 2,
+        minlength: 4,
         maxlength: 30,
     },
     avatar:
