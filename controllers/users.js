@@ -21,26 +21,14 @@ class ValidationError extends Error {
 
 const validationError = new ValidationError('Некорректные параметры запроса');
 
-/* return error object */
-
-function errorCatcher(errorname, validationError, castError) {
-    if (errorname === 'ValidationError') {
-        return { status: validationError.statusCode, message: validationError.message };
-    }
-    else if (errorname === 'CastError') {
-        return { status: castError.statusCode, message: castError.message };;
-    }
-    return null; //  uncaughtException 
-};
-
 /*common response handling */
 function handleResponse(promise, res) {
     promise
         .then((user) => {
-            if(res.headersSent) return;
+            if (res.headersSent) return;
             if (!user)
-                return Promise.reject(castError);            
-            res.send({ data: user }); 
+                return Promise.reject(castError);
+            res.send({ data: user });
         })
         .catch((e) => {
             if (e.statusCode < 500)
@@ -51,8 +39,10 @@ function handleResponse(promise, res) {
 }
 
 module.exports.getUsers = (req, res) => {
-    handleResponse(
-        User.find({}), res);
+    handleResponse(User.find({})
+        .catch(() => {
+            res.status(validationError.statusCode).send({ message: validationError.message });
+        }), res);
 };
 
 module.exports.getUser = (req, res) => {
@@ -65,7 +55,11 @@ module.exports.getUser = (req, res) => {
 
 module.exports.createUser = (req, res) => {
     const { name, about, avatar } = req.body;
-    handleResponse(User.create({ name, about, avatar }), res);
+    handleResponse(User.create({ name, about, avatar })
+        .catch(() => {
+            res.status(validationError.statusCode).send({ message: validationError.message });
+        }
+        ), res);
 };
 
 module.exports.updateUser = (req, res) => {
@@ -75,7 +69,11 @@ module.exports.updateUser = (req, res) => {
             new: true,
             runValidators: true,
             upsert: true
-        }), res);
+        })
+        .catch(() => {
+            res.status(validationError.statusCode).send({ message: validationError.message });
+        }
+        ), res);
 };
 
 module.exports.updateAvatar = (req, res) => {
