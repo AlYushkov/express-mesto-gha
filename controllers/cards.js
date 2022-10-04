@@ -36,14 +36,17 @@ function errorCatcher(errorname, validationError, castError) {
 /*common response handling */
 function handleResponse(promise, res) {
     promise
-        .then(card => res.send({ data: card }))
+        .then(card => {
+            if (res.headersSent) return;
+            if (!card)
+                return Promise.reject(castError);
+            res.send({ data: card });
+        })
         .catch((e) => {
-            const error = errorCatcher(e.name, validationError, castError);
-            if (error) {
-                res.status(error.status).send({ message: error.message });
-                return;
-            }
-            res.status(500).send({ message: 'Ошибка на сервере' });
+            if (e.statusCode < 500)
+                res.status(e.statusCode).send({ message: e.message });
+            else
+                res.status(500).send({ message: 'Ошибка на сервере' });
         });
 }
 

@@ -1,3 +1,4 @@
+const { response } = require('express');
 const User = require('../models/user');
 
 class CastError extends Error {
@@ -8,7 +9,7 @@ class CastError extends Error {
     }
 };
 
-const castError = new CastError('Ошибочный тип или отсутсвие данных');
+const castError = new CastError('Нет данных');
 
 class ValidationError extends Error {
     constructor(message) {
@@ -18,12 +19,11 @@ class ValidationError extends Error {
     }
 };
 
-const validationError = new ValidationError('Переданы некорректные данные');
+const validationError = new ValidationError('Некорректные параметры запроса');
 
 /* return error object */
 
 function errorCatcher(errorname, validationError, castError) {
-    console.log(errorname);
     if (errorname === 'ValidationError') {
         return { status: validationError.statusCode, message: validationError.message };
     }
@@ -37,27 +37,30 @@ function errorCatcher(errorname, validationError, castError) {
 function handleResponse(promise, res) {
     promise
         .then((user) => {
-            if (!user) {
-                return Promise.reject(castError);
-            }
-            res.send({ data: user })
+            if(res.headersSent) return;
+            if (!user)
+                return Promise.reject(castError);            
+            res.send({ data: user }); 
         })
         .catch((e) => {
-            const error = errorCatcher(e.name, validationError, castError);
-            if (error) {
-                res.status(error.status).send({ message: error.message });
-                return;
-            }
-            res.status(500).send({ message: 'Ошибка на сервере' });
+            if (e.statusCode < 500)
+                res.status(e.statusCode).send({ message: e.message });
+            else
+                res.status(500).send({ message: 'Ошибка на сервере' });
         });
 }
 
 module.exports.getUsers = (req, res) => {
-    handleResponse(User.find({}), res);
+    handleResponse(
+        User.find({}), res);
 };
 
 module.exports.getUser = (req, res) => {
-    handleResponse(User.findById(req.params.id), res);
+    handleResponse(User.findById(req.params.id)
+        .catch(() => {
+            res.status(validationError.statusCode).send({ message: validationError.message });
+        }
+        ), res);
 };
 
 module.exports.createUser = (req, res) => {
