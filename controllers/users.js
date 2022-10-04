@@ -63,7 +63,7 @@ module.exports.createUser = (req, res) => {
 
 module.exports.updateUser = (req, res) => {
     handleResponse(User.findByIdAndUpdate(req.user._id,
-        { about: req.body.about },
+        { name: req.body.name, about: req.body.about },
         {
             new: true,
             runValidators: true,
