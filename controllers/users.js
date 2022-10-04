@@ -1,4 +1,3 @@
-const { response } = require('express');
 const User = require('../models/user');
 
 class CastError extends Error {
@@ -64,7 +63,7 @@ module.exports.createUser = (req, res) => {
 
 module.exports.updateUser = (req, res) => {
     handleResponse(User.findByIdAndUpdate(req.user._id,
-        { name: req.body.name },
+        { about: req.body.about },
         {
             new: true,
             runValidators: true,
