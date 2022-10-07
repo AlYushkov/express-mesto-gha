@@ -2,14 +2,14 @@
 const Card = require('../models/card');
 
 class CardError extends Error {
-  constructor(errStatus) {
-    if (errStatus === 400) {
+  constructor(errName) {
+    if (errName === 'ValidationError') {
       super('Некорректные параметры запроса');
-      this.statusCode = errStatus;
+      this.statusCode = 400;
       this.name = 'ValidationError';
-    } else if (errStatus === 404) {
-      super('Нет данных');
-      this.statusCode = errStatus;
+    } else if (errName === 'CastError') {
+      super('Не найдено');
+      this.statusCode = 404;
       this.name = 'CastError';
     } else {
       super('Ошибка на сервере');
@@ -26,7 +26,7 @@ function handleResponse(promise, res) {
       if (res.headersSent) return;
       if (!card) {
         // eslint-disable-next-line consistent-return
-        return Promise.reject(new CardError(404));
+        return Promise.reject(new CardError('CastError'));
       }
       res.send({ data: card });
     })
@@ -34,7 +34,7 @@ function handleResponse(promise, res) {
       if (e instanceof CardError) {
         res.status(e.statusCode).send({ message: e.message });
       } else {
-        const err = new CardError(e.statusCode);
+        const err = new CardError(e.name);
         res.status(err.statusCode).send({ message: err.message });
       }
     });
@@ -44,7 +44,7 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   handleResponse(Card.create({ name, link, owner: req.user._id })
     .catch((e) => {
-      const err = new CardError(e.statusCode);
+      const err = new CardError(e.name);
       res.status(err.statusCode).send({ message: err.message });
     }), res);
 };
@@ -52,7 +52,7 @@ module.exports.createCard = (req, res) => {
 module.exports.getCards = (req, res) => {
   handleResponse(Card.find({}).populate(['owner', 'likes'])
     .catch((e) => {
-      const err = new CardError(e.statusCode);
+      const err = new CardError(e.name);
       res.status(err.statusCode).send({ message: err.message });
     }), res);
 };
@@ -60,7 +60,7 @@ module.exports.getCards = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   handleResponse(Card.findByIdAndRemove(req.params.cardId)
     .catch((e) => {
-      const err = new CardError(e.statusCode);
+      const err = new CardError(e.name);
       res.status(err.statusCode).send({ message: err.message });
     }), res);
 };
@@ -71,7 +71,7 @@ module.exports.likeCard = (req, res) => handleResponse(Card.findByIdAndUpdate(
   { new: true }
 )
   .catch((e) => {
-    const err = new CardError(e.statusCode);
+    const err = new CardError(e.name);
     res.status(err.statusCode).send({ message: err.message });
   }), res);
 
@@ -81,6 +81,6 @@ module.exports.dislikeCard = (req, res) => handleResponse(Card.findByIdAndUpdate
   { new: true }
 )
   .catch((e) => {
-    const err = new CardError(e.statusCode);
+    const err = new CardError(e.name);
     res.status(err.statusCode).send({ message: err.message });
   }), res);

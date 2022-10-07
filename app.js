@@ -33,7 +33,11 @@ app.use((error, req, res, next) => {
   res.status(error.status || 500);
   if (error.status === 400) {
     res.json({
-      message: 'Не существует'
+      message: 'Некорректные параметры запроса'
+    });
+  } else if (error.status === 404) {
+    res.json({
+      message: 'Не найдено'
     });
   } else {
     res.json({

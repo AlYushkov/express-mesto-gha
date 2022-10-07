@@ -2,14 +2,14 @@
 const User = require('../models/user');
 
 class UserError extends Error {
-  constructor(errStatus) {
-    if (errStatus === 400) {
+  constructor(errName) {
+    if (errName === 'ValidationError') {
       super('Некорректные параметры запроса');
-      this.statusCode = errStatus;
+      this.statusCode = 400;
       this.name = 'ValidationError';
-    } else if (errStatus === 404) {
-      super('Нет данных');
-      this.statusCode = errStatus;
+    } else if (errName === 'CastError') {
+      super('Нет найдено');
+      this.statusCode = 404;
       this.name = 'CastError';
     } else {
       super('Ошибка на сервере');
@@ -26,7 +26,7 @@ function handleResponse(promise, res) {
       if (res.headersSent) return;
       if (!user) {
         // eslint-disable-next-line consistent-return
-        return Promise.reject(new UserError(404));
+        return Promise.reject(new UserError('CastError'));
       }
       res.send({ data: user });
     })
@@ -34,7 +34,7 @@ function handleResponse(promise, res) {
       if (e instanceof UserError) {
         res.status(e.statusCode).send({ message: e.message });
       } else {
-        const err = new UserError(e.statusCode);
+        const err = new UserError(e.name);
         res.status(err.statusCode).send({ message: err.message });
       }
     });
@@ -44,7 +44,7 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   handleResponse(User.create({ name, about, avatar })
     .catch((e) => {
-      const err = new UserError(e.statusCode);
+      const err = new UserError(e.name);
       res.status(err.statusCode).send({ message: err.message });
     }), res);
 };
@@ -52,7 +52,7 @@ module.exports.createUser = (req, res) => {
 module.exports.getUsers = (req, res) => {
   handleResponse(User.find({})
     .catch((e) => {
-      const err = new UserError(e.statusCode);
+      const err = new UserError(e.name);
       res.status(err.statusCode).send({ message: err.message });
     }), res);
 };
@@ -60,7 +60,7 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUser = (req, res) => {
   handleResponse(User.findById(req.params.id)
     .catch((e) => {
-      const err = new UserError(e.statusCode);
+      const err = new UserError(e.name);
       res.status(err.statusCode).send({ message: err.message });
     }), res);
 };
@@ -76,7 +76,7 @@ module.exports.updateUser = (req, res) => {
     }
   )
     .catch((e) => {
-      const err = new UserError(e.statusCode);
+      const err = new UserError(e.name);
       res.status(err.statusCode).send({ message: err.message });
     }), res);
 };
@@ -92,7 +92,7 @@ module.exports.updateAvatar = (req, res) => {
     }
   )
     .catch((e) => {
-      const err = new UserError(e.statusCode);
+      const err = new UserError(e.name);
       res.status(err.statusCode).send({ message: err.message });
     }), res);
 };
