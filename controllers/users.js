@@ -8,9 +8,13 @@ class UserError extends Error {
       this.statusCode = 400;
       this.name = 'ValidationError';
     } else if (errName === 'CastError') {
-      super('Нет найдено');
-      this.statusCode = 404;
+      super('Некорректный тип данных');
+      this.statusCode = 400;
       this.name = 'CastError';
+    } else if (errName === 'NoDataError') {
+      super('Нет данных');
+      this.statusCode = 404;
+      this.name = 'NoDataErrorr';
     } else {
       super('Ошибка на сервере');
       this.statusCode = 500;
@@ -26,7 +30,7 @@ function handleResponse(promise, res) {
       if (res.headersSent) return;
       if (!user) {
         // eslint-disable-next-line consistent-return
-        return Promise.reject(new UserError('CastError'));
+        return Promise.reject(new UserError('NoDataError'));
       }
       res.send({ data: user });
     })
@@ -45,7 +49,7 @@ module.exports.createUser = (req, res) => {
   handleResponse(User.create({ name, about, avatar })
     .catch((e) => {
       const err = new UserError(e.name);
-      res.status(err.statusCode).send({ message: err.message });
+      res.status(err.statusCode).send({ message: 'err.message' });
     }), res);
 };
 

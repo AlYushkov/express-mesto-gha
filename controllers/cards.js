@@ -8,9 +8,13 @@ class CardError extends Error {
       this.statusCode = 400;
       this.name = 'ValidationError';
     } else if (errName === 'CastError') {
-      super('Не найдено');
-      this.statusCode = 404;
+      super('Некорректный тип данных');
+      this.statusCode = 400;
       this.name = 'CastError';
+    } else if (errName === 'NoDataError') {
+      super('Нет данных');
+      this.statusCode = 404;
+      this.name = 'NoDataErrorr';
     } else {
       super('Ошибка на сервере');
       this.statusCode = 500;
@@ -26,7 +30,7 @@ function handleResponse(promise, res) {
       if (res.headersSent) return;
       if (!card) {
         // eslint-disable-next-line consistent-return
-        return Promise.reject(new CardError('CastError'));
+        return Promise.reject(new CardError('NoDataError'));
       }
       res.send({ data: card });
     })
