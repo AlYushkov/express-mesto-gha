@@ -3,7 +3,7 @@ const { Router } = require('express');
 const cardRouter = Router();
 
 const {
-  createCard, getCards, deleteCard, likeCard, dislikeCard
+  createCard, getCards, deleteCard, likeCard, dislikeCard,
 } = require('../controllers/cards');
 
 cardRouter.post('/cards', createCard);

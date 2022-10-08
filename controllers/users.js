@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const User = require('../models/user');
 
 class UserError extends Error {
@@ -76,8 +75,8 @@ module.exports.updateUser = (req, res) => {
     {
       new: true,
       runValidators: true,
-      upsert: false
-    }
+      upsert: false,
+    },
   )
     .catch((e) => {
       const err = new UserError(e.name);
@@ -92,8 +91,8 @@ module.exports.updateAvatar = (req, res) => {
     {
       new: true,
       runValidators: true,
-      upsert: false
-    }
+      upsert: false,
+    },
   )
     .catch((e) => {
       const err = new UserError(e.name);

@@ -14,7 +14,7 @@ app.use(express.json());
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '63365614e8919f0fa9d65a70'
+    _id: '63365614e8919f0fa9d65a70',
   };
   next();
 });
@@ -33,15 +33,15 @@ app.use((error, req, res, next) => {
   res.status(error.status || 500);
   if (error.status === 400) {
     res.json({
-      message: 'Некорректные параметры запроса'
+      message: 'Некорректные параметры запроса',
     });
   } else if (error.status === 404) {
     res.json({
-      message: 'Не найдено'
+      message: 'Не найдено',
     });
   } else {
     res.json({
-      message: 'Неизвестная ошибка'
+      message: 'Неизвестная ошибка',
     });
   }
   next();

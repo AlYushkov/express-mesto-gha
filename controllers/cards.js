@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const Card = require('../models/card');
 
 class CardError extends Error {
@@ -24,6 +23,7 @@ class CardError extends Error {
 }
 
 /* common response handling */
+
 function handleResponse(promise, res) {
   promise
     .then((card) => {
@@ -72,7 +72,7 @@ module.exports.deleteCard = (req, res) => {
 module.exports.likeCard = (req, res) => handleResponse(Card.findByIdAndUpdate(
   req.params.cardId,
   { $addToSet: { likes: req.user._id } },
-  { new: true }
+  { new: true },
 )
   .catch((e) => {
     const err = new CardError(e.name);
@@ -82,7 +82,7 @@ module.exports.likeCard = (req, res) => handleResponse(Card.findByIdAndUpdate(
 module.exports.dislikeCard = (req, res) => handleResponse(Card.findByIdAndUpdate(
   req.params.cardId,
   { $pull: { likes: req.user._id } },
-  { new: true }
+  { new: true },
 )
   .catch((e) => {
     const err = new CardError(e.name);

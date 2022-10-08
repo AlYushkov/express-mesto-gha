@@ -1,0 +1,6 @@
+/node_modules
+.editorcongig
+package-lock.json
+package.json
+README.node_modules
+.github
