@@ -71,7 +71,9 @@ module.exports.likeCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((e) => {
-      if (e.name === 'CastError') {
+      if (e.name === 'ValidationError') {
+        res.status(404).send({ message: 'Некорректные данные' });
+      } else if (e.name === 'CastError') {
         res.status(404).send({ message: 'Некорректные данные' });
       } else {
         res.status(500).send({ msessage: 'Ошибка на сервере' });
@@ -93,7 +95,11 @@ module.exports.dislikeCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((e) => {
-      if (e.name === 'CastError') { res.status(404).send({ msessage: 'Некорректные данные' }); } else {
+      if (e.name === 'ValidationError') {
+        res.status(404).send({ message: 'Некорректные данные' });
+      } else if (e.name === 'CastError') {
+        res.status(404).send({ message: 'Некорректные данные' });
+      } else {
         res.status(500).send({ msessage: 'Ошибка на сервере' });
       }
     });
