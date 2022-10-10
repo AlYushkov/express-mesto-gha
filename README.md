@@ -1,7 +1,7 @@
 
 # [Проект 13](https://github.com/AlYushkov/express-mesto-gha/index.html)
 
-## ЮШКОВ
+## Юшков
 
 [![Tests for sprint 13](https://github.com/${AlYushkov}/${иxpress-mesto-gha}/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/${AlYushkov}/${express-mesto-gha}/actions/workflows/tests-13-sprint.yml)
 

@@ -24,6 +24,7 @@ module.exports.getUsers = (req, res) => {
       if (user.length === 0) {
         res.status(300).send({ msessage: 'Нет данных' });
       }
+      res.send({ data: user });
     })
     .catch(() => {
       res.status(500).send({ msessage: 'Ошибка на сервере' });
