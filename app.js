@@ -24,24 +24,20 @@ app.use('/', userRouter);
 app.use('/', cardRouter);
 
 app.use((req, res, next) => {
-  const err = new Error('Не существует');
+  const err = new Error('Не найдено');
   err.status = 404;
   next(err);
 });
 
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
-  if (error.status === 400) {
+  if (error.status === 404) {
     res.json({
-      message: 'Некорректные параметры запроса',
-    });
-  } else if (error.status === 404) {
-    res.json({
-      message: 'Не найдено',
+      message: error.message,
     });
   } else {
     res.json({
-      message: 'Неизвестная ошибка',
+      message: 'Ошибка на сервере',
     });
   }
   next();

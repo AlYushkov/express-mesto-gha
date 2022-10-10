@@ -1,75 +1,54 @@
 const User = require('../models/user');
 
-class UserError extends Error {
-  constructor(errName) {
-    if (errName === 'ValidationError') {
-      super('Некорректные параметры запроса');
-      this.statusCode = 400;
-      this.name = 'ValidationError';
-    } else if (errName === 'CastError') {
-      super('Некорректный тип данных');
-      this.statusCode = 400;
-      this.name = 'CastError';
-    } else if (errName === 'NoDataError') {
-      super('Нет данных');
-      this.statusCode = 404;
-      this.name = 'NoDataErrorr';
-    } else {
-      super('Ошибка на сервере');
-      this.statusCode = 500;
-      this.name = 'DefaultError';
-    }
-  }
-}
-
-/* common response handling */
-function handleResponse(promise, res) {
-  promise
+module.exports.createUser = (req, res) => {
+  const { name, about, avatar } = req.body;
+  User.create({ name, about, avatar })
     .then((user) => {
-      if (res.headersSent) return;
       if (!user) {
-        // eslint-disable-next-line consistent-return
-        return Promise.reject(new UserError('NoDataError'));
+        res.status(404).send({ msessage: 'Пользователь не сохранен' });
       }
       res.send({ data: user });
     })
     .catch((e) => {
-      if (e instanceof UserError) {
-        res.status(e.statusCode).send({ message: e.message });
+      if (e.name === 'ValidationError') {
+        res.status(400).send({ message: 'Некорректные данные' });
       } else {
-        const err = new UserError(e.name);
-        res.status(err.statusCode).send({ message: err.message });
+        res.status(500).send({ msessage: 'Ошибка на сервере' });
       }
     });
-}
-
-module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  handleResponse(User.create({ name, about, avatar })
-    .catch((e) => {
-      const err = new UserError(e.name);
-      res.status(err.statusCode).send({ message: 'err.message' });
-    }), res);
 };
 
 module.exports.getUsers = (req, res) => {
-  handleResponse(User.find({})
-    .catch((e) => {
-      const err = new UserError(e.name);
-      res.status(err.statusCode).send({ message: err.message });
-    }), res);
+  User.find({})
+    .then((user) => {
+      if (user.length === 0) {
+        res.status(300).send({ msessage: 'Нет данных' });
+      }
+    })
+    .catch(() => {
+      res.status(500).send({ msessage: 'Ошибка на сервере' });
+    });
 };
 
 module.exports.getUser = (req, res) => {
-  handleResponse(User.findById(req.params.id)
+  User.findById(req.params.id)
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ msessage: `Пользователь по id ${req.params.id} не найден` });
+      }
+      res.send({ data: user });
+    })
     .catch((e) => {
-      const err = new UserError(e.name);
-      res.status(err.statusCode).send({ message: err.message });
-    }), res);
+      if (e.name === 'CastError') {
+        res.status(400).send({ message: 'Некорректный тип данных' });
+      } else {
+        res.status(500).send({ msessage: 'Ошибка на сервере' });
+      }
+    });
 };
 
 module.exports.updateUser = (req, res) => {
-  handleResponse(User.findByIdAndUpdate(
+  User.findByIdAndUpdate(
     req.user._id,
     { name: req.body.name, about: req.body.about },
     {
@@ -78,14 +57,23 @@ module.exports.updateUser = (req, res) => {
       upsert: false,
     },
   )
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ msessage: `Пользователь по id ${req.user._id} не найден` });
+      }
+      res.send({ data: user });
+    })
     .catch((e) => {
-      const err = new UserError(e.name);
-      res.status(err.statusCode).send({ message: err.message });
-    }), res);
+      if (e.name === 'ValidationError') {
+        res.status(400).send({ message: 'Некорректные данные' });
+      } else {
+        res.status(500).send({ msessage: 'Ошибка на сервере' });
+      }
+    });
 };
 
 module.exports.updateAvatar = (req, res) => {
-  handleResponse(User.findByIdAndUpdate(
+  User.findByIdAndUpdate(
     req.user._id,
     { avatar: req.body.avatar },
     {
@@ -94,8 +82,17 @@ module.exports.updateAvatar = (req, res) => {
       upsert: false,
     },
   )
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ msessage: `Пользователь по id ${req.user._id} не найден` });
+      }
+      res.send({ data: user });
+    })
     .catch((e) => {
-      const err = new UserError(e.name);
-      res.status(err.statusCode).send({ message: err.message });
-    }), res);
+      if (e.name === 'ValidationError') {
+        res.status(400).send({ message: 'Некорректные данные' });
+      } else {
+        res.status(500).send({ msessage: 'Ошибка на сервере' });
+      }
+    });
 };
