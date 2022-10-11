@@ -64,13 +64,15 @@ module.exports.likeCard = (req, res) => {
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
-        return Promise.reject(new Error('500'));
+        return Promise.reject(new Error('404'));
       }
       res.send({ data: card });
     })
     .catch((e) => {
-      if (e.name === 'CastError') {
-        res.status(404).send({ message: 'Некорректные данные' });
+      if (e.message === '404') {
+        res.status(404).send({ message: 'Нет данных' });
+      } else if (e.name === 'CastError') {
+        res.status(400).send({ message: 'Некорректные данные' });
       } else {
         res.status(500).send({ msessage: 'Ошибка на сервере' });
       }
@@ -86,13 +88,15 @@ module.exports.dislikeCard = (req, res) => {
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
-        return Promise.reject(new Error('500'));
+        return Promise.reject(new Error('404'));
       }
       res.send({ data: card });
     })
     .catch((e) => {
-      if (e.name === 'CastError') {
-        res.status(404).send({ message: 'Некорректные данные' });
+      if (e.message === '404') {
+        res.status(404).send({ message: 'Нет данных' });
+      } else if (e.name === 'CastError') {
+        res.status(400).send({ message: 'Некорректные данные' });
       } else {
         res.status(500).send({ msessage: 'Ошибка на сервере' });
       }
