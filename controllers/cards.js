@@ -38,16 +38,18 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findByIdAndRemove(req.params.id)
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
-        return Promise.reject(new Error('500'));
+        return Promise.reject(new Error('400'));
       }
       res.send({ data: card });
     })
     .catch((e) => {
-      if (e.name === 'CastError') {
+      if (e.message === '400') {
+        res.status(400).send({ message: 'Нет данных' });
+      } else if (e.name === 'CastError') {
         res.status(404).send({ message: 'Некорректные данные' });
       } else {
         res.status(500).send({ msessage: 'Ошибка на сервере' });
@@ -57,7 +59,7 @@ module.exports.deleteCard = (req, res) => {
 
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    req.params.id,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
@@ -81,7 +83,7 @@ module.exports.likeCard = (req, res) => {
 
 module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    req.params.id,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
