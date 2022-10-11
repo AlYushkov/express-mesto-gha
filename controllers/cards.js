@@ -30,7 +30,7 @@ module.exports.getCards = (req, res) => {
     })
     .catch((e) => {
       if (e.message === '300') {
-        res.status(300).send({ msessage: 'Нет данных' });
+        res.status(300).send({ msessage: 'Нет записей в базе данных' });
       } else {
         res.status(500).send({ msessage: 'Ошибка на сервере' });
       }
