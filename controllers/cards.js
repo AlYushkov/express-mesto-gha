@@ -42,15 +42,15 @@ module.exports.deleteCard = (req, res) => {
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
-        return Promise.reject(new Error('400'));
+        return Promise.reject(new Error('404'));
       }
       res.send({ data: card });
     })
     .catch((e) => {
-      if (e.message === '400') {
-        res.status(400).send({ message: 'Нет данных' });
+      if (e.message === '404') {
+        res.status(404).send({ message: 'Нет данных!' });
       } else if (e.name === 'CastError') {
-        res.status(404).send({ message: 'Некорректные данные' });
+        res.status(400).send({ message: 'Некорректные данные' });
       } else {
         res.status(500).send({ msessage: 'Ошибка на сервере' });
       }
