@@ -24,7 +24,7 @@ app.use('/', userRouter);
 app.use('/', cardRouter);
 
 app.use((req, res, next) => {
-  const err = new Error('Не найдено');
+  const err = new Error('Не найдено!');
   err.status = 404;
   next(err);
 });

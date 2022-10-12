@@ -21,19 +21,11 @@ module.exports.createCard = (req, res) => {
 
 module.exports.getCards = (req, res) => {
   Card.find({}).populate(['owner', 'likes'])
-    // eslint-disable-next-line consistent-return
     .then((card) => {
-      if (card.length === 0) {
-        return Promise.reject(new Error('300'));
-      }
       res.send({ data: card });
     })
-    .catch((e) => {
-      if (e.message === '300') {
-        res.status(300).send({ msessage: 'Нет записей в базе данных' });
-      } else {
-        res.status(500).send({ msessage: 'Ошибка на сервере' });
-      }
+    .catch(() => {
+      res.status(500).send({ msessage: 'Ошибка на сервере' });
     });
 };
 
