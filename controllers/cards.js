@@ -39,7 +39,11 @@ module.exports.getCards = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
+    // eslint-disable-next-line consistent-return
     .then((card) => {
+      if (!card) {
+        return Promise.reject(new Error('404'));
+      }
       res.send({ data: card });
     })
     .catch((e) => {
