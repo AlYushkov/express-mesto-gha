@@ -21,19 +21,11 @@ module.exports.createUser = (req, res) => {
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    // eslint-disable-next-line consistent-return
     .then((user) => {
-      if (user.length === 0) {
-        return Promise.reject(new Error('300'));
-      }
       res.send({ data: user });
     })
-    .catch((e) => {
-      if (e.message === '300') {
-        res.status(300).send({ msessage: 'Нет данных' });
-      } else {
-        res.status(500).send({ msessage: 'Ошибка на сервере' });
-      }
+    .catch(() => {
+      res.status(500).send({ msessage: 'Ошибка на сервере' });
     });
 };
 

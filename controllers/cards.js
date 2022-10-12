@@ -20,7 +20,7 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.getCards = (req, res) => {
-  Card.find({}).populate(['owner', 'likes'])
+  Card.find({})
     .then((card) => {
       res.send({ data: card });
     })
