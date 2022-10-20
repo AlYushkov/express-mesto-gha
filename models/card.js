@@ -12,6 +12,11 @@ const cardSchema = new Schema({
   link:
     {
       type: String,
+      validate: {
+        validator(v) {
+          return /^(https?:\/\/)?([\w.]+)\.([a-z]{2,6}\.?)(\/[\w.]*)*\/?$/.test(v);
+        },
+      },
       required: true,
     },
   owner: {

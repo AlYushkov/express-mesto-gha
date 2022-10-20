@@ -1,6 +1,8 @@
 const Card = require('../models/card');
 
-module.exports.createCard = (req, res) => {
+const { AppError, appErrors } = require('../utils/app-error');
+
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     // eslint-disable-next-line consistent-return
@@ -11,45 +13,60 @@ module.exports.createCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((e) => {
+      let err;
       if (e.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        err = new AppError(appErrors.badRequest);
       } else {
-        res.status(500).send({ msessage: 'Ошибка на сервере' });
+        err = new AppError(appErrors.serverError);
       }
+      next(err);
     });
 };
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((card) => {
       res.send({ data: card });
     })
     .catch(() => {
-      res.status(500).send({ msessage: 'Ошибка на сервере' });
+      const err = new AppError(appErrors.serverError);
+      next(err);
     });
 };
 
-module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    // eslint-disable-next-line consistent-return
+module.exports.deleteCard = (req, res, next) => {
+  Card.findOne({ _id: req.params.cardId })
+  // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
         return Promise.reject(new Error('404'));
+      } if (card.owner !== req.user._id) {
+        return Promise.reject(new Error('403'));
       }
+    })
+    .then((card) => {
+      Card.deleteOne({ _id: card._id });
+    })
+    // eslint-disable-next-line consistent-return
+    .then((card) => {
       res.send({ data: card });
     })
     .catch((e) => {
+      let err;
       if (e.message === '404') {
-        res.status(404).send({ message: 'Нет данных!' });
+        err = new AppError(appErrors.notFound);
+      } else if (e.message === '403') {
+        err = new AppError(appErrors.forbidden);
       } else if (e.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        err = new AppError(appErrors.badRequest);
       } else {
-        res.status(500).send({ msessage: 'Ошибка на сервере' });
+        err = new AppError(appErrors.serverError);
       }
+      next(err);
     });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -63,17 +80,19 @@ module.exports.likeCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((e) => {
+      let err;
       if (e.message === '404') {
-        res.status(404).send({ message: 'Нет данных' });
+        err = new AppError(appErrors.notFound);
       } else if (e.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        err = new AppError(appErrors.badRequest);
       } else {
-        res.status(500).send({ msessage: 'Ошибка на сервере' });
+        err = new AppError(appErrors.serverError);
       }
+      next(err);
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -87,12 +106,14 @@ module.exports.dislikeCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((e) => {
+      let err;
       if (e.message === '404') {
-        res.status(404).send({ message: 'Нет данных' });
+        err = new AppError(appErrors.notFound);
       } else if (e.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        err = new AppError(appErrors.badRequest);
       } else {
-        res.status(500).send({ msessage: 'Ошибка на сервере' });
+        err = new AppError(appErrors.serverError);
       }
+      next(err);
     });
 };
