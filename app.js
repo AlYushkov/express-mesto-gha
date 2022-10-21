@@ -1,4 +1,5 @@
 const express = require('express');
+
 const { celebrate, Joi, errors } = require('celebrate');
 
 const cookieParser = require('cookie-parser');
@@ -32,13 +33,15 @@ app.post('/signin', celebrate({
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(/^(https?:\/\/)?([\w.]+)\.([a-z]{2,6}\.?)(\/[\w.]*)*\/?$/),
+    name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
+    about: Joi.string().min(2).max(30).default('Исследователь'),
+    avatar: Joi.string().uri().default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
-  }),
+  }).unknown(true),
 }), createUser);
+
+app.use(errors());
 
 app.use(auth);
 
@@ -50,8 +53,6 @@ app.use((req, res, next) => {
   const err = new AppError(appErrors.notFound);
   next(err);
 });
-
-app.use(errors());
 
 app.use((error, req, res, next) => {
   res.status(error.statusCode);

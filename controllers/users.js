@@ -31,6 +31,7 @@ module.exports.createUser = (req, res, next) => {
       res.send({ data: user });
     })
     .catch((e) => {
+      console.log(e);
       let err;
       if (e.message === '409') {
         err = new AppError(appErrors.conflict);

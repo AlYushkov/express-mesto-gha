@@ -24,7 +24,7 @@ const schema = new Schema({
       type: String,
       validate: {
         validator(v) {
-          return /^(https?:\/\/)?([\w.]+)\.([a-z]{2,6}\.?)(\/[\w.]*)*\/?$/.test(v);
+          return /https?:\/\/[A-Za-z0-9:\-_~:/?#[\]@!$&'()*+,;=.]*([/]{1}.*\/?)$/.test(v);
         },
       },
       required: false,
