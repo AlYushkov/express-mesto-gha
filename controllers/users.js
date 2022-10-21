@@ -22,7 +22,14 @@ module.exports.createUser = (req, res, next) => {
       if (!user) {
         return Promise.reject(new Error('500'));
       }
-      res.send({ data: user });
+      res.send({
+        data: {
+          name: user.name,
+          about: user.about,
+          avata: user.avatar,
+          email: user.email,
+        },
+      });
     })
     .catch((e) => {
       let err;
@@ -148,7 +155,7 @@ module.exports.login = (req, res, next) => {
           httpOnly: true,
           sameSite: true,
         })
-        .end();
+        .send({ data: user });
     })
     .catch((e) => {
       let err;
