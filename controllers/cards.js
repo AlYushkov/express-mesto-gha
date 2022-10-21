@@ -35,7 +35,8 @@ module.exports.getCards = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findOne({ _id: req.params.cardId })
+  const { cardId } = req.params;
+  Card.findById(cardId)
   // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
@@ -45,11 +46,14 @@ module.exports.deleteCard = (req, res, next) => {
       }
     })
     .then(() => {
-      Card.findByIdAndRemove({ _id: req.params.cardId });
-    })
-    // eslint-disable-next-line consistent-return
-    .then((card) => {
-      res.send({ data: card });
+      Card.findByIdAndRemove(cardId)
+      // eslint-disable-next-line consistent-return
+        .then((card) => {
+          if (!card) {
+            return Promise.reject(new Error('500'));
+          }
+          res.send({ data: card });
+        });
     })
     .catch((e) => {
       let err;
