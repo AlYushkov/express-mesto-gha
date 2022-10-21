@@ -9,13 +9,7 @@ const { DEV_JWT_SECRET } = require('../utils/dev-key');
 const { AppError, appErrors } = require('../utils/app-error');
 
 module.exports.createUser = (req, res, next) => {
-  User.findOne({ email: req.body.email })
-    .then((user) => {
-      if (user) {
-        return Promise.reject(new Error('409'));
-      }
-      return bcrypt.hash(req.body.password, 10);
-    })
+  bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       name: req.body.name,
       about: req.body.about,
@@ -31,9 +25,8 @@ module.exports.createUser = (req, res, next) => {
       res.send({ data: user });
     })
     .catch((e) => {
-      console.log(e);
       let err;
-      if (e.message === '409') {
+      if (e.code === 11000) {
         err = new AppError(appErrors.conflict);
       } else if (e.name === 'ValidationError') {
         err = new AppError(appErrors.badRequest);
