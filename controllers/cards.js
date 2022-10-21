@@ -40,9 +40,8 @@ module.exports.deleteCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         return Promise.reject(new Error('404'));
-      } if (card.owner !== req.user._id) {
-        return Promise.reject(new Error('403'));
       }
+      return (card.owner === req.user._id) ? Promise.reject(new Error('403')) : card;
     })
     .then((card) => {
       Card.deleteOne({ _id: card._id });

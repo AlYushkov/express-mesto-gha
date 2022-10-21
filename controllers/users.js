@@ -23,12 +23,7 @@ module.exports.createUser = (req, res, next) => {
         return Promise.reject(new Error('500'));
       }
       res.send({
-        data: {
-          name: user.name,
-          about: user.about,
-          avata: user.avatar,
-          email: user.email,
-        },
+        data: user,
       });
     })
     .catch((e) => {
