@@ -1,9 +1,7 @@
 
-# [Проект 13](https://github.com/AlYushkov/express-mesto-gha/index.html)
+# [Проект 14](https://github.com/AlYushkov/express-mesto-gha/index.html)
 
 ## Юшков
-
-[![Tests for sprint 13](https://github.com/${AlYushkov}/${иxpress-mesto-gha}/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/${AlYushkov}/${express-mesto-gha}/actions/workflows/tests-13-sprint.yml)
 
 [![Tests for sprint 14](https://github.com/${AlYushkov}/${xpress-mesto-gha}/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/${AlYushkov}/${express-mesto-gha}/actions/workflows/tests-14-sprint.yml)
 
