@@ -1,7 +1,10 @@
 const { Schema, model } = require('mongoose');
+
 const bcrypt = require('bcrypt');
 
 const validator = require('validator');
+
+const { AppError, appErrors } = require('../utils/app-error');
 
 const schema = new Schema({
   name: {
@@ -58,7 +61,7 @@ schema.statics.findUserByCredentials = function VerifyUser(email, password) {
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error('401'));
+            return Promise.reject(new AppError(appErrors.notAuthorized));
           }
           return user;
         });

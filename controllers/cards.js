@@ -8,13 +8,15 @@ module.exports.createCard = (req, res, next) => {
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
-        return Promise.reject(new Error('500'));
+        return Promise.reject(new AppError(appErrors.serverError));
       }
       res.send({ data: card });
     })
     .catch((e) => {
       let err;
-      if (e.name === 'ValidationError') {
+      if (e.statusCode) {
+        err = e;
+      } else if (e.name === 'ValidationError') {
         err = new AppError(appErrors.badRequest);
       } else {
         err = new AppError(appErrors.serverError);
@@ -40,27 +42,29 @@ module.exports.deleteCard = (req, res, next) => {
   // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
-        return Promise.reject(new Error('404'));
+        return Promise.reject(new AppError(appErrors.notFound));
       } if (String(card.owner) !== req.user._id) {
-        return Promise.reject(new Error('403'));
+        return Promise.reject(new AppError(appErrors.forbidden));
       }
     })
+    // eslint-disable-next-line consistent-return
     .then(() => {
-      Card.findByIdAndRemove(cardId)
-      // eslint-disable-next-line consistent-return
+      const promise = Card.findByIdAndRemove(cardId);
+      if (!promise) {
+        return Promise.reject(new AppError(appErrors.serverError));
+      }
+      promise // eslint-disable-next-line consistent-return
         .then((card) => {
           if (!card) {
-            return Promise.reject(new Error('500'));
+            return Promise.reject(new AppError(appErrors.serverError));
           }
           res.send({ data: card });
         });
     })
     .catch((e) => {
       let err;
-      if (e.message === '404') {
-        err = new AppError(appErrors.notFound);
-      } else if (e.message === '403') {
-        err = new AppError(appErrors.forbidden);
+      if (e.statusCode) {
+        err = e;
       } else if (e.name === 'CastError') {
         err = new AppError(appErrors.badRequest);
       } else {
@@ -79,14 +83,14 @@ module.exports.likeCard = (req, res, next) => {
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
-        return Promise.reject(new Error('404'));
+        return Promise.reject(new AppError(appErrors.notFound));
       }
       res.send({ data: card });
     })
     .catch((e) => {
       let err;
-      if (e.message === '404') {
-        err = new AppError(appErrors.notFound);
+      if (e.statusCode) {
+        err = e;
       } else if (e.name === 'CastError') {
         err = new AppError(appErrors.badRequest);
       } else {
@@ -105,14 +109,14 @@ module.exports.dislikeCard = (req, res, next) => {
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
-        return Promise.reject(new Error('404'));
+        return Promise.reject(new AppError(appErrors.notFound));
       }
       res.send({ data: card });
     })
     .catch((e) => {
       let err;
-      if (e.message === '404') {
-        err = new AppError(appErrors.notFound);
+      if (e.statusCode) {
+        err = e;
       } else if (e.name === 'CastError') {
         err = new AppError(appErrors.badRequest);
       } else {

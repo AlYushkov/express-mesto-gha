@@ -20,7 +20,7 @@ module.exports.createUser = (req, res, next) => {
   // eslint-disable-next-line consistent-return
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error('500'));
+        return Promise.reject(new AppError(appErrors.serverError));
       }
       res.send({
         data: {
@@ -37,6 +37,8 @@ module.exports.createUser = (req, res, next) => {
         err = new AppError(appErrors.conflict);
       } else if (e.name === 'ValidationError') {
         err = new AppError(appErrors.badRequest);
+      } else if (e.statusCode) {
+        err = e;
       } else {
         err = new AppError(appErrors.serverError);
       }
@@ -72,14 +74,14 @@ module.exports.getUser = (req, res, next) => {
     // eslint-disable-next-line consistent-return
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error('404'));
+        return Promise.reject(new AppError(appErrors.notFound));
       }
       res.send({ data: user });
     })
     .catch((e) => {
       let err;
-      if (e.message === '404') {
-        err = new AppError(appErrors.notFound);
+      if (e.statusCode) {
+        err = e;
       } else if (e.name === 'CastError') {
         err = new AppError(appErrors.badRequest);
       } else {
@@ -102,13 +104,15 @@ module.exports.updateUser = (req, res, next) => {
     // eslint-disable-next-line consistent-return
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error('500'));
+        return Promise.reject(new AppError(appErrors.serverError));
       }
       res.send({ data: user });
     })
     .catch((e) => {
       let err;
-      if (e.name === 'ValidationError') {
+      if (e.statusCode) {
+        err = e;
+      } else if (e.name === 'ValidationError') {
         err = new AppError(appErrors.badRequest);
       } else {
         err = new AppError(appErrors.serverError);
@@ -130,13 +134,15 @@ module.exports.updateAvatar = (req, res, next) => {
     // eslint-disable-next-line consistent-return
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error('500'));
+        return Promise.reject(new AppError(appErrors.serverError));
       }
       res.send({ data: user });
     })
     .catch((e) => {
       let err;
-      if (e.name === 'ValidationError') {
+      if (e.statusCode) {
+        err = e;
+      } else if (e.name === 'ValidationError') {
         err = new AppError(appErrors.badRequest);
       } else {
         err = new AppError(appErrors.serverError);
@@ -159,8 +165,8 @@ module.exports.login = (req, res, next) => {
     })
     .catch((e) => {
       let err;
-      if (e.message === '401' || e.status === '401') {
-        err = new AppError(appErrors.notAuthorized);
+      if (e.statusCode) {
+        err = e;
       } else {
         err = new AppError(appErrors.serverError);
       }
