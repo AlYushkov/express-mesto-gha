@@ -56,7 +56,7 @@ schema.statics.findUserByCredentials = function VerifyUser(email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error('401'));
+        return Promise.reject(new AppError(appErrors.notAuthorized));
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
