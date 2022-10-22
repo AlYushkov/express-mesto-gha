@@ -55,10 +55,17 @@ app.use((req, res, next) => {
 app.use(errors());
 
 app.use((error, req, res, next) => {
-  res.status(error.statusCode);
-  res.json({
-    message: error.message,
-  });
+  res.status(error.statusCode || 500);
+  if (error.statusCode) {
+    res.json({
+      message: error.message,
+    });
+  } else {
+    res.json({
+      message: 'Ошибка на сервере',
+    });
+  }
+
   next();
 });
 
