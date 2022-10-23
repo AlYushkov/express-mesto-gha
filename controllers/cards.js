@@ -47,18 +47,17 @@ module.exports.deleteCard = (req, res, next) => {
         return Promise.reject(new AppError(appErrors.forbidden));
       }
     })
-    // eslint-disable-next-line consistent-return
     .then(() => {
-      const promise = Card.findByIdAndRemove(cardId);
-      if (!promise) {
-        return Promise.reject(new AppError(appErrors.serverError));
-      }
-      promise // eslint-disable-next-line consistent-return
+      Card.findByIdAndRemove(cardId)
+      // eslint-disable-next-line consistent-return
         .then((card) => {
           if (!card) {
             return Promise.reject(new AppError(appErrors.serverError));
           }
           res.send({ data: card });
+        })
+        .catch((e) => {
+          next(e);
         });
     })
     .catch((e) => {
