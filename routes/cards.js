@@ -14,18 +14,18 @@ cardRouter.post('/cards', celebrate({
     link: Joi.string().required().regex(/^https?:\/\/[A-Za-z0-9-_~:@/!/$&'()*+,;=?#[].]*([/]*.*\/?)$/),
   }),
 }), createCard);
-cardRouter.get('/cards', getCards);
-cardRouter.delete('/cards/:cardId', celebrate({
+cardRouter.get('/', getCards);
+cardRouter.delete('/:cardId', celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().hex(),
   }),
 }), deleteCard);
-cardRouter.put('/cards/:cardId/likes', celebrate({
+cardRouter.put('/:cardId/likes', celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().hex(),
   }),
 }), likeCard);
-cardRouter.delete('/cards/:cardId/likes', celebrate({
+cardRouter.delete('/:cardId/likes', celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().hex(),
   }),
