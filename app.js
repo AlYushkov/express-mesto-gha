@@ -43,9 +43,9 @@ app.post('/signup', celebrate({
 
 app.use(auth);
 
-app.use('/users', userRouter);
+app.use('/', userRouter);
 
-app.use('/cards', cardRouter);
+app.use('/', cardRouter);
 
 app.use((req, res, next) => {
   const err = new AppError(appErrors.notFound);

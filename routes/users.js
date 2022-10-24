@@ -8,24 +8,24 @@ const {
   getUser, getUsers, updateUser, updateAvatar, getMe,
 } = require('../controllers/users');
 
-userRouter.get('/', getUsers);
+userRouter.get('/users', getUsers);
 
-userRouter.get('/me', getMe);
+userRouter.get('/users/me', getMe);
 
-userRouter.get('/:id', celebrate({
+userRouter.get('/users/:id', celebrate({
   params: Joi.object().keys({
     id: Joi.string().hex(),
   }),
 }), getUser);
 
-userRouter.patch('/me', celebrate({
+userRouter.patch('/users/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
   }),
 }), updateUser);
 
-userRouter.patch('/me/avatar', celebrate({
+userRouter.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().regex(/^https?:\/\/[A-Za-z0-9-_~:@/!/$&'()*+,;=?#[].]*([/]*.*\/?)$/),
   }).unknown(true),
