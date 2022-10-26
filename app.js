@@ -6,9 +6,9 @@ const cookieParser = require('cookie-parser');
 
 const mongoose = require('mongoose');
 
-const { PORT = 3000 } = process.env;
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const auth = require('./middlewares/auth');
+const { PORT = 3000 } = process.env;
 
 const userRouter = require('./routes/users');
 
@@ -23,6 +23,8 @@ const app = express();
 app.use(cookieParser());
 
 app.use(express.json());
+
+app.use(requestLogger);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -41,11 +43,11 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-app.use(auth);
+app.use('/users', userRouter);
 
-app.use('/', userRouter);
+app.use('/cards', cardRouter);
 
-app.use('/', cardRouter);
+app.use(errorLogger);
 
 app.use((req, res, next) => {
   const err = new AppError(appErrors.notFound);
