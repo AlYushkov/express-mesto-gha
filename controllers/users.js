@@ -158,6 +158,7 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, DEV_JWT_SECRET, { expiresIn: '7d' });
       res
         .cookie('jwt', token, {
+          maxAge: 7 * 24 * 60 * 60 * 1000,
           httpOnly: true,
           sameSite: true,
         })
@@ -172,4 +173,9 @@ module.exports.login = (req, res, next) => {
       }
       next(err);
     });
+};
+
+module.exports.logout = (req, res, next) => {
+  res.clearCookie('jwt').json({ message: 'До встречи!' });
+  next();
 };

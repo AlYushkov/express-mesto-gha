@@ -1,5 +1,13 @@
 const express = require('express');
 
+const cors = require('cors');
+
+const corsOptions = {
+  origin: 'http://localhost:5000',
+  optionsSuccessStatus: 200,
+  credentials: true,
+};
+
 const { celebrate, Joi, errors } = require('celebrate');
 
 const cookieParser = require('cookie-parser');
@@ -14,11 +22,13 @@ const userRouter = require('./routes/users');
 
 const cardRouter = require('./routes/cards');
 
-const { createUser, login } = require('./controllers/users');
+const { createUser, login, logout } = require('./controllers/users');
 
 const { AppError, appErrors } = require('./utils/app-error');
 
 const app = express();
+
+app.use(cors(corsOptions));
 
 app.use(cookieParser());
 
@@ -43,6 +53,8 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
+app.get('/signuot', logout);
+
 app.use('/users', userRouter);
 
 app.use('/cards', cardRouter);
@@ -57,16 +69,8 @@ app.use((req, res, next) => {
 app.use(errors());
 
 app.use((error, req, res, next) => {
-  res.status(error.statusCode || 500);
-  if (error.statusCode) {
-    res.json({
-      message: error.message,
-    });
-  } else {
-    res.json({
-      message: 'Ошибка на сервере',
-    });
-  }
+  const errMessage = error.statusCode ? error.message : 'Ошибка на серверe';
+  res.status(error.statusCode || 500).json({ message: errMessage });
 
   next();
 });
